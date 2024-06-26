@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useUserInfo from '../hooks/useUserInfo';
 import UserTable from './UserTable';
 
@@ -10,6 +10,8 @@ const CRM = () => {
     const [nameFilter, setNameFilter] = useState('');
     const [cityFilter, setCityFilter] = useState('');
     const [highlightOldest, setHighlightOldest] = useState(false);
+    const [debouncedNameFilter, setDebouncedNameFilter] = useState('');
+
   
   /* Created a memoized list of unique cities
  The cities array contains unique, sorted city names of the users.
@@ -27,12 +29,12 @@ const CRM = () => {
     return users.filter(user => {
       const nameMatch = (user.firstName + ' ' + user.lastName)
         .toLowerCase()
-        .includes(nameFilter.toLowerCase());
+        .includes(debouncedNameFilter.toLowerCase());
       const cityMatch = !cityFilter || user.address.city === cityFilter;
       
       return nameMatch && cityMatch;
     });
-  }, [users, nameFilter, cityFilter]);
+  }, [users, debouncedNameFilter, cityFilter]);
 
   /* Found the oldest user for each city and stores the oldest birthdate for each city.
   */
@@ -47,6 +49,16 @@ const CRM = () => {
     return cityOldest;
   }, [filteredUsers]);
 
+  /* custom debounce effect added */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedNameFilter(nameFilter);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [nameFilter]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
