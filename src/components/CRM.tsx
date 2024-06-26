@@ -1,15 +1,49 @@
 
+import { useMemo, useState } from 'react';
 import useUserInfo from '../hooks/useUserInfo';
+import UserTable from './UserTable';
 
 
 const CRM = () => {
     const { users, loading, error } = useUserInfo();
-    console.log(users) //- fetched the data successfully from - https://dummyjson.com/users
+    const [nameFilter, setNameFilter] = useState('');
+
+  
+  /* filter for the user list
+  filteredUsers is a memoized array that created and applies to first or last name.
+  */
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const nameMatch = (user.firstName + ' ' + user.lastName)
+        .toLowerCase()
+        .includes(nameFilter.toLowerCase());
+      
+      return nameMatch;
+    });
+  }, [users, nameFilter]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
   return (
-    <></>
+    <div className="container mt-4 mb-5 border border-3 border-light bg-dark rounded-5">
+        <div className="row mt-5">
+          <div className="col-md-3 offset-md-2 ">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search by name"
+              onChange={e => setNameFilter(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="row mt-4 mb-3">
+          <div className='col-md-8 offset-md-2 border border-3 border-secondary rounded-5 bg-light '>
+            <UserTable 
+              users={filteredUsers} 
+            />
+          </div>
+      </div>
+    </div>
   );
 
 }

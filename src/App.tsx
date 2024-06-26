@@ -1,7 +1,7 @@
 import dpsLogo from './assets/DPS.svg';
 import './App.css';
 import CRM from './components/CRM';
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 // https://dummyjson.com/users
 
 function App() {
